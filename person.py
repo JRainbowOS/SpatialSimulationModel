@@ -9,6 +9,7 @@ class Person(Host):
     DT = 1
     SPEED = 1
     CURVATURE = pi / 3
+    SEED = 149
 
     def __init__(self, 
                  _id,
@@ -17,14 +18,17 @@ class Person(Host):
         self._id = _id
         self.status = status
         self.position = position
+        # self.seed = np.random.seed(Person.SEED)
         self.bearing = 2 * pi * np.random.random()
-        self.trace = [position]
+        self.trace_x = [position.x]
+        self.trace_y = [position.y]
 
     def step(self):
         dx, dy = self._find_displacement()
         self.position.x += dx
         self.position.y += dy
-        self.trace.append(self.position)
+        self.trace_x.append(self.position.x)
+        self.trace_y.append(self.position.y)
         return self.position
 
     def _find_displacement(self):
@@ -47,13 +51,11 @@ def main():
     man = Person(_id=1,
                  status='infected',
                  position=START)
-    x_trace = []
-    y_trace = []
+
     for _ in range(10):
         new_position = man.step()
-        x_trace.append(new_position.x)
-        y_trace.append(new_position.y)
-    plt.plot(x_trace, y_trace)
+
+    plt.plot(man.trace_x, man.trace_y)
     plt.show()
 
 if __name__ == '__main__':

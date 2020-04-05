@@ -13,7 +13,7 @@ class Population(ABC):
         self._hosts = hosts
         self.ids = None
         self.host_dict = self._create_host_dict()
-        self.trace_dict = self._create_trace_dict()
+        # self.trace_dict = self._create_trace_dict()
 
     def _create_host_dict(self):
         ids = [host._id for host in self._hosts]
@@ -21,10 +21,10 @@ class Population(ABC):
         host_dict = {i: host for (i, host) in zip(ids, self._hosts)}
         return host_dict
 
-    def _create_trace_dict(self):
-        initial_positions = [[host.position] for host in self._hosts]
-        trace_dict = {_id: initial_positions[j] for _id, j in enumerate(self.ids)}
-        return trace_dict
+    # def _create_trace_dict(self):
+    #     initial_positions = [[host.position] for host in self._hosts]
+    #     trace_dict = {_id: initial_positions[j] for _id, j in enumerate(self.ids)}
+    #     return trace_dict
 
     @abstractclassmethod
     def multistep(self):

@@ -11,14 +11,13 @@ class Community(Population):
         self._hosts = people
         self.ids = None
         self.host_dict = self._create_host_dict()
-        self.trace_dict = self._create_trace_dict()
+        # self.trace_dict = self._create_trace_dict()
 
     def multistep(self):
         for _id, person in self.host_dict.items():
             # print(f'evolving person id: {_id}')
             # print(f'initial position: {self.host_dict[_id].position}')
             person.step()
-            # TODO: add trace
             # print(f'new position: {self.host_dict[_id].position}')
         # return self.host_dict
     
@@ -27,8 +26,13 @@ def main():
     START = Cartesian2D(0, 0)
     people_list = [Person(i, 'infected', START) for i in range(10)]
     com = Community(people_list)
-    print(com.trace_dict)
-    com.multistep()
+    bearing_list = [person.bearing for person in people_list]
+    print(bearing_list)
+    # print(com.trace_dict)
+    for _ in range(10):
+        com.multistep()
+    tr = com.host_dict[1].trace_x
+    # print(tr)
 
 if __name__ == '__main__':
     main()
