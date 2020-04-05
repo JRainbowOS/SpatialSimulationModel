@@ -21,6 +21,7 @@ class Outbreak(Scenario):
         self.grid = grid
         self.community = community
         self._ids = []
+        self.traced = False
         self.toroidal_trace_dict_x = {}
         self.toroidal_trace_dict_y = {}
 
@@ -34,15 +35,19 @@ class Outbreak(Scenario):
             t = self.grid.trace_list_to_toroidal(person.trace_y)
             self.toroidal_trace_dict_y[_id] = t
             self._ids.append(_id)
+            self.traced = True
             if plot:
                 plt.scatter(s, t)
         if plot:
             plt.show()
 
-    def animate(self):
+    def animate_outbreak(self):
         """
         Produce an animation of the pursuit processed so far
         """
+        if not self.traced:
+            self.toroidal_trace()
+
         dt = Outbreak.DT
 
         fig = plt.figure()
@@ -60,55 +65,62 @@ class Outbreak(Scenario):
             person_xdata, person_ydata = [], []
             community_xdata[_id] = person_xdata
             community_ydata[_id] = person_ydata
-            ln, = ax.plot([], [], 'ro', linewidth=2, markersize=1)
+            if self.community.host_dict[_id].status == 'infected':
+                col = 'ro'
+            else:
+                col = 'go'
+            ln, = ax.plot([], [], col, linewidth=2, markersize=1)
             lines.append(ln)
 
         def init_animation():
-            # for _id in self._ids:
-            #     ln = community_ln[_id]
-            #     ln.set_data([], [])
             for ln in lines:
-                ln.set_data([], [])
-            time_text.set_text('')
-            return lines[0], time_text
+                ln.set_data([0, 1], [1, 2])
+            # time_text.set_text('')
+            return lines #, time_text
 
         def animate(i):
-            for i, _id in enumerate(self._ids):
+            for lnum, _id in enumerate(self._ids):
                 community_xdata[_id].append(self.toroidal_trace_dict_x[_id][i])
                 community_ydata[_id].append(self.toroidal_trace_dict_y[_id][i])
-                lines[i].set_data(community_xdata[_id], community_ydata[_id])
+                lines[lnum].set_data(community_xdata[_id], community_ydata[_id])
 
-            time_text.set_text(time_template % (i * dt))
-            return lines[0], time_text
+            # time_text.set_text(time_template % (i * dt))
+            return lines #, time_text
             # return ln_chaser, ln_chased, time_text
 
+        print('Creating animation')
         FuncAnimation(fig, 
                       animate,
                       len(self.toroidal_trace_dict_x[_id]), # not very nice!
                       init_func=init_animation,
-                      interval=500,
+                      interval=50,
                       blit=True,
-                      repeat=False)
+                      repeat=True)
         plt.show()
 
 
-
-def person_generator(grid_size):
+def person_generator(grid_size, chance_infected=0.1):
     i = 1
     while True:
         start_x, start_y = np.random.uniform(0, grid_size, size=2)
         start = Cartesian2D(start_x, start_y)
-        person = Person(_id=i,
-                        status='susceptible',
-                        position=start)
+        infected = (np.random.uniform(0, 1) < chance_infected)
+        if infected:
+            person = Person(_id=i,
+                            status='infected',
+                            position=start)
+        else:
+            person = Person(_id=i,
+                            status='susceptible',
+                            position=start)
         i += 1
         yield person
 
 def main():
     
-    NUM_PEOPLE = 10  
-    GRID_SIZE = 5  
-    TIME_STEPS = 5
+    NUM_PEOPLE = 25
+    GRID_SIZE = 10  
+    TIME_STEPS = 250
 
     pg = person_generator(GRID_SIZE)
     people = [next(pg) for _ in range(NUM_PEOPLE)]
@@ -121,10 +133,8 @@ def main():
     for _ in range(TIME_STEPS):
         ob.evolve()
 
-    ob.toroidal_trace(plot=False)
-    # print(ob.toroidal_trace_dict_x)
-    # print(ob._ids)
-    ob.animate()
+    # ob.toroidal_trace(plot=False)
+    ob.animate_outbreak()
 
 if __name__ == '__main__':
     main()

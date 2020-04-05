@@ -7,7 +7,7 @@ import numpy as np
 class Person(Host):
 
     DT = 1
-    SPEED = 1
+    SPEED = 0.1
     CURVATURE = pi / 3
     SEED = 149
 

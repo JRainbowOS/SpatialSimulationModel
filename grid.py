@@ -5,7 +5,7 @@ from cartesian import Cartesian2D
 
 class Grid(Tile):
 
-    GRIDSIZE = 10
+    GRIDSIZE = 5
     COORD_SYSTEM = Cartesian2D
 
     def __init__(self):

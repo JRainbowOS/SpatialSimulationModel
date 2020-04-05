@@ -15,10 +15,7 @@ class Community(Population):
 
     def multistep(self):
         for _id, person in self.host_dict.items():
-            # print(f'evolving person id: {_id}')
-            # print(f'initial position: {self.host_dict[_id].position}')
             person.step()
-            # print(f'new position: {self.host_dict[_id].position}')
         # return self.host_dict
     
 def main():

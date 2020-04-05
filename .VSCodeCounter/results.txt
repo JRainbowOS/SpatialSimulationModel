@@ -1,0 +1,39 @@
+Date : 2020-04-05 20:51:21
+Directory : c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel
+Total : 14 files,  485 codes, 63 comments, 174 blanks, all 722 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Python   |         13 |        483 |         63 |        173 |        719 |
+| Markdown |          1 |          2 |          0 |          1 |          3 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                 | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                    |         14 |        485 |         63 |        174 |        722 |
++--------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                             | language | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\README.md          | Markdown |          2 |          0 |          1 |          3 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\animate_example.py | Python   |         38 |          3 |         15 |         56 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\cartesian.py       | Python   |         32 |          0 |         12 |         44 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\community.py       | Python   |         24 |          7 |          8 |         39 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\coordinate.py      | Python   |         11 |          3 |          7 |         21 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\grid.py            | Python   |         36 |          3 |         13 |         52 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\host.py            | Python   |         17 |          0 |          5 |         22 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\mole.py            | Python   |         33 |          3 |         12 |         48 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\outbreak.py        | Python   |        103 |         11 |         27 |        141 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\person.py          | Python   |         49 |          1 |         12 |         62 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\population.py      | Python   |         27 |          5 |         16 |         48 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\pursuit.py         | Python   |         91 |         24 |         35 |        150 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\scenario.py        | Python   |         14 |          3 |          7 |         24 |
+| c:\Users\JRainbow\Documents\Python Scripts\SpatialSimulationModel\tile.py            | Python   |          8 |          0 |          4 |         12 |
+| Total                                                                                |          |        485 |         63 |        174 |        722 |
++--------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
