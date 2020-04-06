@@ -18,7 +18,7 @@ class Person(Host):
         self._id = _id
         self.status = status
         self.position = position
-        # self.seed = np.random.seed(Person.SEED)
+        self.status_history = [status]
         self.bearing = 2 * pi * np.random.random()
         self.trace_x = [position.x]
         self.trace_y = [position.y]

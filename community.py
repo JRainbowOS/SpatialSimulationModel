@@ -11,6 +11,7 @@ class Community(Population):
         self._hosts = people
         self.ids = None
         self.host_dict = self._create_host_dict()
+        self.status_history_dict = self._create_status_history_dict()
 
     def multistep(self):
         for _id, person in self.host_dict.items():
@@ -18,8 +19,14 @@ class Community(Population):
 
     def spread_infection(self, radius):
         at_risk_susceptibles = self._at_risk_susceptibles(radius=radius)
-        for _id in at_risk_susceptibles:
-            self.host_dict[_id].status = 'infected'
+        for _id in self.host_dict.keys():
+            if _id in at_risk_susceptibles:
+                # Status changes
+                self.status_history_dict[_id].append('infected')
+                self.host_dict[_id].status = 'infected'
+            else:
+                # Status persists
+                self.status_history_dict[_id].append(self.status_history_dict[_id][-1])
         return at_risk_susceptibles
 
     def _at_risk_susceptibles(self, radius):
@@ -67,6 +74,8 @@ def main():
     com.spread_infection(radius=3)
     s, i, r = com._sir_id()
     print(s, i, r)
+    shd = com.status_history_dict
+    print(shd)
 
 if __name__ == '__main__':
     main()

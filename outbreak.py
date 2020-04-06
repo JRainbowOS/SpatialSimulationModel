@@ -134,7 +134,7 @@ def main():
     NUM_PEOPLE = 25
     NUM_INFECTED = 1
     GRID_SIZE = 5  
-    TIME_STEPS = 100
+    TIME_STEPS = 50
     RADIUS_OF_INFECTION = 1
 
     pg = person_generator(grid_size=GRID_SIZE, 

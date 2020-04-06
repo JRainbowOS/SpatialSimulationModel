@@ -13,6 +13,7 @@ class Population(ABC):
         self._hosts = hosts
         self.ids = None
         self.host_dict = self._create_host_dict()
+        self.status_history_dict = self._create_status_history_dict()
         # self.trace_dict = self._create_trace_dict()
 
     def _create_host_dict(self):
@@ -21,14 +22,18 @@ class Population(ABC):
         host_dict = {i: host for (i, host) in zip(ids, self._hosts)}
         return host_dict
 
+    def _create_status_history_dict(self):
+        status_history_dict = {i: [host.status] for (i, host) in zip(self.ids, self._hosts)}
+        return status_history_dict
+
     # def _create_trace_dict(self):
     #     initial_positions = [[host.position] for host in self._hosts]
     #     trace_dict = {_id: initial_positions[j] for _id, j in enumerate(self.ids)}
     #     return trace_dict
 
-    @abstractclassmethod
-    def multistep(self):
-        pass
+    # @abstractclassmethod
+    # def multistep(self):
+    #     pass
 
 
 def main():
@@ -37,8 +42,8 @@ def main():
     host_list = [Person(i, 'infected', START) for i in range(10)]
     print(host_list)
     pop = Population(host_list)
-    print(pop.trace_dict)
-
+    status_dict = pop.status_history_dict
+    print(status_dict)
 
 if __name__ == '__main__':
     main()
