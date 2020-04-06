@@ -25,9 +25,16 @@ class Outbreak(Scenario):
         self.toroidal_trace_dict_x = {}
         self.toroidal_trace_dict_y = {}
 
-    def evolve(self):
+    def evolve(self, radius=1):
         self.community.multistep()
-        self.community.spread_infection(radius=1)
+        self.community.spread_infection(radius=radius)
+        self.sir_statistics()
+
+    def sir_statistics(self):
+        s_id, i_id, r_id = self.community._sir_id()
+        print(f'\nNumber of Susceptible: \t {len(s_id)}')
+        print(f'Number of Infected: \t {len(i_id)}')
+        print(f'Number of Removed: \t {len(r_id)} \n')
 
     def toroidal_trace(self, plot=False):
         for _id, person in self.community.host_dict.items():
@@ -80,6 +87,7 @@ class Outbreak(Scenario):
             return lines #, time_text
 
         def animate(i):
+            self.sir_statistics()
             for lnum, _id in enumerate(self._ids):
                 community_xdata[_id].append(self.toroidal_trace_dict_x[_id][i])
                 community_ydata[_id].append(self.toroidal_trace_dict_y[_id][i])
@@ -100,12 +108,16 @@ class Outbreak(Scenario):
         plt.show()
 
 
-def person_generator(grid_size, chance_infected=0.1):
+def person_generator(grid_size, num_people, num_infected):
+    assert num_infected < num_people, 'Cannot be more infected than total people!'
     i = 1
-    while True:
+    while i < num_people + 1:
         start_x, start_y = np.random.uniform(0, grid_size, size=2)
         start = Cartesian2D(start_x, start_y)
-        infected = (np.random.uniform(0, 1) < chance_infected)
+        if i < num_infected + 1:
+            infected = True
+        else:
+            infected = False
         if infected:
             person = Person(_id=i,
                             status='infected',
@@ -120,11 +132,16 @@ def person_generator(grid_size, chance_infected=0.1):
 def main():
     
     NUM_PEOPLE = 25
-    GRID_SIZE = 10  
-    TIME_STEPS = 250
+    NUM_INFECTED = 1
+    GRID_SIZE = 5  
+    TIME_STEPS = 100
+    RADIUS_OF_INFECTION = 1
 
-    pg = person_generator(GRID_SIZE)
+    pg = person_generator(grid_size=GRID_SIZE, 
+                          num_people=NUM_PEOPLE,
+                          num_infected=NUM_INFECTED)
     people = [next(pg) for _ in range(NUM_PEOPLE)]
+
     com = Community(people)
 
     grd = Grid()
@@ -132,7 +149,7 @@ def main():
     ob = Outbreak(grd, com)
 
     for _ in range(TIME_STEPS):
-        ob.evolve()
+        ob.evolve(radius=RADIUS_OF_INFECTION)
 
     # ob.toroidal_trace(plot=False)
     ob.animate_outbreak()
