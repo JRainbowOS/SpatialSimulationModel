@@ -27,6 +27,7 @@ class Outbreak(Scenario):
 
     def evolve(self):
         self.community.multistep()
+        self.community.spread_infection(radius=1)
 
     def toroidal_trace(self, plot=False):
         for _id, person in self.community.host_dict.items():

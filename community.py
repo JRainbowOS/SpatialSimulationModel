@@ -11,25 +11,62 @@ class Community(Population):
         self._hosts = people
         self.ids = None
         self.host_dict = self._create_host_dict()
-        # self.trace_dict = self._create_trace_dict()
 
     def multistep(self):
         for _id, person in self.host_dict.items():
             person.step()
-        # return self.host_dict
+
+    def spread_infection(self, radius):
+        at_risk_susceptibles = self._at_risk_susceptibles(radius=radius)
+        for _id in at_risk_susceptibles:
+            self.host_dict[_id].status = 'infected'
+        return at_risk_susceptibles
+
+    def _at_risk_susceptibles(self, radius):
+        sus, inf, rem = self._sir_id()
+        infected_positions = [self._get_location(_id) for _id in inf]
+        at_risk_susceptibles = []
+        for s in sus:
+            sus_pos = self._get_location(s)
+            for inf_pos in infected_positions:
+                if inf_pos.distance_to(sus_pos) < radius:
+                    at_risk_susceptibles.append(s)
+        return at_risk_susceptibles
+
+    def _get_location(self, _id):
+        return self.host_dict[_id].position
+
+
+    def _sir_id(self):
+        # Could include this in multistep?
+        susceptible_ids = []
+        infectious_ids = []
+        removed_ids = []
+        for _id, person in self.host_dict.items():
+            if person.status == 'susceptible':
+                susceptible_ids.append(_id)
+            elif person.status == 'infected':
+                infectious_ids.append(_id)
+            elif person.status == 'removed':
+                removed_ids.append(_id)
+            else:
+                continue
+        return susceptible_ids, infectious_ids, removed_ids
+
     
 def main():
 
     START = Cartesian2D(0, 0)
     people_list = [Person(i, 'infected', START) for i in range(10)]
-    com = Community(people_list)
-    bearing_list = [person.bearing for person in people_list]
-    print(bearing_list)
-    # print(com.trace_dict)
-    for _ in range(10):
-        com.multistep()
-    tr = com.host_dict[1].trace_x
-    # print(tr)
+    man = Person(1, 'infected', Cartesian2D(1, 1))
+    woman = Person(2, 'susceptible', Cartesian2D(1, 3))
+    com = Community([man, woman])
+    s, i, r = com._sir_id()
+    print(s, i, r)
+    risk = com._at_risk_susceptibles(radius=3)
+    com.spread_infection(radius=3)
+    s, i, r = com._sir_id()
+    print(s, i, r)
 
 if __name__ == '__main__':
     main()
