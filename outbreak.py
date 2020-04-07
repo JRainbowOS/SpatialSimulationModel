@@ -24,16 +24,24 @@ class Outbreak(Scenario):
         self.toroidal_trace_dict_x = {}
         self.toroidal_trace_dict_y = {}
 
-    def evolve(self, radius=1):
+    def evolve(self, radius=1, 
+                     chance_of_infection=1,
+                     duration_of_infection=10):
         self.community.multistep()
-        self.community.spread_infection(radius=radius)
-        self.sir_statistics()
+        self.community.spread_infection(radius=radius, 
+                                        chance_of_infection=chance_of_infection,
+                                        grid_size=self.grid.size)
+        rem = self.community.remove_infected(duration_of_infection=duration_of_infection)
+        # print(rem)
+        stat_str = self.sir_statistics()
+        print(stat_str)
 
     def sir_statistics(self):
         s_id, i_id, r_id = self.community._sir_id()
-        print(f'\nNumber of Susceptible: \t {len(s_id)}')
-        print(f'Number of Infected: \t {len(i_id)}')
-        print(f'Number of Removed: \t {len(r_id)} \n')
+        stat_str = f'\nNumber of Susceptible: \t {len(s_id)} \n' + \
+                f'Number of Infected: \t {len(i_id)} \n' + \
+                f'Number of Removed: \t {len(r_id)}'
+        return stat_str
 
     def toroidal_trace(self, plot=False):
         for _id, person in self.community.host_dict.items():
@@ -61,10 +69,18 @@ class Outbreak(Scenario):
         ax = fig.add_subplot(111, autoscale_on=False, xlim=(0, self.grid.size),
                                                       ylim=(0, self.grid.size))
         ax.set_aspect('equal')
+        plt.title('Simulation')
 
         time_template = 'time = %.1fs'
         time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
-        
+        props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+
+        stat_str = self.sir_statistics()
+        # place a text box in upper left in axes coords
+        ax.text(0.05, 0.95, stat_str, transform=ax.transAxes, fontsize=14,
+                verticalalignment='top', bbox=props)
+
+
         community_xdata = {}
         community_ydata = {}
         lines = []
@@ -72,10 +88,12 @@ class Outbreak(Scenario):
             person_xdata, person_ydata = [], []
             community_xdata[_id] = person_xdata
             community_ydata[_id] = person_ydata
-            if self.community.status_history_dict[_id][0] == 'infected':
-                col = 'ro'
-            else:
+            if self.community.status_history_dict[_id][0] == 'susceptible':
                 col = 'go'
+            elif self.community.status_history_dict[_id][0] == 'infected':
+                col = 'ro'
+            elif self.community.status_history_dict[_id][0] == 'removed':
+                col = 'k'
             ln, = ax.plot([], [], col, linewidth=2, markersize=2)
             lines.append(ln)
 
@@ -86,19 +104,23 @@ class Outbreak(Scenario):
             return lines #, time_text
 
         def animate(i):
-            self.sir_statistics()
+            stat_str = self.sir_statistics()
             for lnum, _id in enumerate(self._ids):
                 # community_xdata[_id].append(self.toroidal_trace_dict_x[_id][i])
                 # community_ydata[_id].append(self.toroidal_trace_dict_y[_id][i])
                 community_xdata[_id] = [self.toroidal_trace_dict_x[_id][i]]
                 community_ydata[_id] = [self.toroidal_trace_dict_y[_id][i]]
                 lines[lnum].set_data(community_xdata[_id], community_ydata[_id])
-                if self.community.status_history_dict[_id][i] == 'infected':
-                    col = 'r'
-                else:
+                if self.community.status_history_dict[_id][i] == 'susceptible':
                     col = 'g'
+                elif self.community.status_history_dict[_id][i] == 'infected':
+                    col = 'r'
+                elif self.community.status_history_dict[_id][i] == 'removed':
+                    col = 'k'
                 lines[lnum].set_color(col)
 
+            ax.text(0.05, 0.95, stat_str, transform=ax.transAxes, fontsize=14,
+                    verticalalignment='top', bbox=props)
 
             # time_text.set_text(time_template % (i * dt))
             return lines #, time_text
@@ -140,10 +162,12 @@ def person_generator(grid_size, num_people, num_infected):
 def main():
     
     NUM_PEOPLE = 50
-    NUM_INFECTED = 1
+    NUM_INFECTED = 2
     GRID_SIZE = 10  
-    TIME_STEPS = 250
-    RADIUS_OF_INFECTION = 0.5
+    TIME_STEPS = 50
+    RADIUS_OF_INFECTION = 1
+    CHANCE_OF_INFECTION = 0.02
+    DURATION_OF_INFECTION = 25
     SAVE = True
 
     pg = person_generator(grid_size=GRID_SIZE, 
@@ -158,7 +182,9 @@ def main():
     ob = Outbreak(grd, com)
 
     for _ in range(TIME_STEPS):
-        ob.evolve(radius=RADIUS_OF_INFECTION)
+        ob.evolve(radius=RADIUS_OF_INFECTION,
+                  chance_of_infection=CHANCE_OF_INFECTION,
+                  duration_of_infection=DURATION_OF_INFECTION)
 
     # ob.toroidal_trace(plot=False)
     ani = ob.animate_outbreak()
@@ -166,7 +192,7 @@ def main():
     if SAVE:
         Writer = animation.writers['ffmpeg']
         writer = Writer(fps=15, metadata=dict(artist='JRainbow'), bitrate=1800)
-        ani.save(os.path.join('animations', f'{NUM_PEOPLE}_people_{NUM_INFECTED}_infected_0_5_radius.mp4'), writer=writer)
+        ani.save(os.path.join('animations', f'{NUM_PEOPLE}_people_{NUM_INFECTED}_infected_with_removed_radius_1_chance_0_02_text.mp4'), writer=writer)
 
 if __name__ == '__main__':
     main()

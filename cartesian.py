@@ -17,6 +17,12 @@ class Cartesian2D(Coordinate):
         squared = (new_coord.x - self.x) ** 2 + (new_coord.y - self.y) ** 2
         return np.sqrt(squared)
 
+    def toroidal_position(self, grid_size):
+        x_out = self.x % grid_size
+        y_out = self.y % grid_size
+        out_coord = Cartesian2D(x_out, y_out)
+        return out_coord
+
     def angle_to(self, new_coord):
         assert isinstance(new_coord, Cartesian2D), 'new_coord must also be a Cartesian2D'
         dx = new_coord.x - self.x
@@ -33,12 +39,15 @@ class Cartesian2D(Coordinate):
 
 
 def main():
-    coord1 = Cartesian2D(1,1)
-    print(coord1)
-    coord2 = Cartesian2D(1,0)
+    # coord1 = Cartesian2D(1,1)
+    # print(coord1)
+    # coord2 = Cartesian2D(1,0)
 
-    print(coord1.angle_to(coord2))
-    print(coord1.get_unit_vector(coord2))
+    # print(coord1.angle_to(coord2))
+    # print(coord1.get_unit_vector(coord2))
+
+    coord3 = Cartesian2D(11,-3)
+    print(coord3.toroidal_position(5))
 
 if __name__ == '__main__':
     main()
