@@ -36,7 +36,7 @@ class Community(Population):
         for s in sus:
             sus_pos = self._get_location(s)
             for inf_pos in infected_positions:
-                if inf_pos.distance_to(sus_pos) < radius:
+                if inf_pos.distance_to(sus_pos) < radius: # THIS NEEDS TO BE MOD GRID!
                     at_risk_susceptibles.append(s)
         return at_risk_susceptibles
 

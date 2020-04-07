@@ -1,19 +1,18 @@
 import numpy as np 
-
+import os
 from typing import List
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.animation as animation
 
 from scenario import Scenario
-
 from grid import Grid
 from person import Person
 from community import Community
 from cartesian import Cartesian2D
 
 class Outbreak(Scenario):
-
-    DT = 1 
 
     def __init__(self,
                  grid: Grid,
@@ -56,7 +55,7 @@ class Outbreak(Scenario):
         if not self.traced:
             self.toroidal_trace()
 
-        dt = Outbreak.DT
+        # dt = Outbreak.DT
 
         fig = plt.figure()
         ax = fig.add_subplot(111, autoscale_on=False, xlim=(0, self.grid.size),
@@ -73,39 +72,48 @@ class Outbreak(Scenario):
             person_xdata, person_ydata = [], []
             community_xdata[_id] = person_xdata
             community_ydata[_id] = person_ydata
-            if self.community.host_dict[_id].status == 'infected':
+            if self.community.status_history_dict[_id][0] == 'infected':
                 col = 'ro'
             else:
                 col = 'go'
-            ln, = ax.plot([], [], col, linewidth=2, markersize=1)
+            ln, = ax.plot([], [], col, linewidth=2, markersize=2)
             lines.append(ln)
 
         def init_animation():
             for ln in lines:
-                ln.set_data([0, 1], [1, 2])
+                ln.set_data([], [])
             # time_text.set_text('')
             return lines #, time_text
 
         def animate(i):
             self.sir_statistics()
             for lnum, _id in enumerate(self._ids):
-                community_xdata[_id].append(self.toroidal_trace_dict_x[_id][i])
-                community_ydata[_id].append(self.toroidal_trace_dict_y[_id][i])
+                # community_xdata[_id].append(self.toroidal_trace_dict_x[_id][i])
+                # community_ydata[_id].append(self.toroidal_trace_dict_y[_id][i])
+                community_xdata[_id] = [self.toroidal_trace_dict_x[_id][i]]
+                community_ydata[_id] = [self.toroidal_trace_dict_y[_id][i]]
                 lines[lnum].set_data(community_xdata[_id], community_ydata[_id])
+                if self.community.status_history_dict[_id][i] == 'infected':
+                    col = 'r'
+                else:
+                    col = 'g'
+                lines[lnum].set_color(col)
+
 
             # time_text.set_text(time_template % (i * dt))
             return lines #, time_text
             # return ln_chaser, ln_chased, time_text
 
         print('Creating animation')
-        FuncAnimation(fig, 
-                      animate,
-                      len(self.toroidal_trace_dict_x[_id]), # not very nice!
-                      init_func=init_animation,
-                      interval=50,
-                      blit=True,
-                      repeat=True)
+        ani = animation.FuncAnimation(fig, 
+                                        animate,
+                                        len(self.toroidal_trace_dict_x[_id]), # not very nice!
+                                        init_func=init_animation,
+                                        interval=50,
+                                        blit=True,
+                                        repeat=False)
         plt.show()
+        return ani
 
 
 def person_generator(grid_size, num_people, num_infected):
@@ -131,11 +139,12 @@ def person_generator(grid_size, num_people, num_infected):
 
 def main():
     
-    NUM_PEOPLE = 25
+    NUM_PEOPLE = 50
     NUM_INFECTED = 1
-    GRID_SIZE = 5  
-    TIME_STEPS = 50
-    RADIUS_OF_INFECTION = 1
+    GRID_SIZE = 10  
+    TIME_STEPS = 250
+    RADIUS_OF_INFECTION = 0.5
+    SAVE = True
 
     pg = person_generator(grid_size=GRID_SIZE, 
                           num_people=NUM_PEOPLE,
@@ -152,7 +161,12 @@ def main():
         ob.evolve(radius=RADIUS_OF_INFECTION)
 
     # ob.toroidal_trace(plot=False)
-    ob.animate_outbreak()
+    ani = ob.animate_outbreak()
+
+    if SAVE:
+        Writer = animation.writers['ffmpeg']
+        writer = Writer(fps=15, metadata=dict(artist='JRainbow'), bitrate=1800)
+        ani.save(os.path.join('animations', f'{NUM_PEOPLE}_people_{NUM_INFECTED}_infected_0_5_radius.mp4'), writer=writer)
 
 if __name__ == '__main__':
     main()
