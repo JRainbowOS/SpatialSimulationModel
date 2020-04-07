@@ -69,33 +69,38 @@ class Outbreak(Scenario):
         ax = fig.add_subplot(111, autoscale_on=False, xlim=(0, self.grid.size),
                                                       ylim=(0, self.grid.size))
         ax.set_aspect('equal')
-        plt.title('Simulation')
+        plt.title('Epidemic Simulation')
 
         time_template = 'time = %.1fs'
         time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
         props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 
-        stat_str = self.sir_statistics()
-        # place a text box in upper left in axes coords
-        ax.text(0.05, 0.95, stat_str, transform=ax.transAxes, fontsize=14,
-                verticalalignment='top', bbox=props)
-
-
         community_xdata = {}
         community_ydata = {}
         lines = []
+        s_num, i_num, r_num = 0, 0, 0
         for _id in self._ids:
             person_xdata, person_ydata = [], []
             community_xdata[_id] = person_xdata
             community_ydata[_id] = person_ydata
             if self.community.status_history_dict[_id][0] == 'susceptible':
                 col = 'go'
+                s_num += 1
             elif self.community.status_history_dict[_id][0] == 'infected':
                 col = 'ro'
+                i_num += 1
             elif self.community.status_history_dict[_id][0] == 'removed':
                 col = 'k'
+                r_num += 1
             ln, = ax.plot([], [], col, linewidth=2, markersize=2)
             lines.append(ln)
+
+        stat_str = f'\nNumber of Susceptible: {s_num} \n' + \
+                f'Number of Infected: {i_num} \n' + \
+                f'Number of Removed: {r_num}'
+        # place a text box in upper left in axes coords
+        ax.text(0.05, 0.95, stat_str, transform=ax.transAxes, fontsize=8,
+                verticalalignment='top', bbox=props)
 
         def init_animation():
             for ln in lines:
@@ -104,7 +109,7 @@ class Outbreak(Scenario):
             return lines #, time_text
 
         def animate(i):
-            stat_str = self.sir_statistics()
+            s_num, i_num, r_num = 0, 0, 0
             for lnum, _id in enumerate(self._ids):
                 # community_xdata[_id].append(self.toroidal_trace_dict_x[_id][i])
                 # community_ydata[_id].append(self.toroidal_trace_dict_y[_id][i])
@@ -113,13 +118,19 @@ class Outbreak(Scenario):
                 lines[lnum].set_data(community_xdata[_id], community_ydata[_id])
                 if self.community.status_history_dict[_id][i] == 'susceptible':
                     col = 'g'
+                    s_num += 1
                 elif self.community.status_history_dict[_id][i] == 'infected':
                     col = 'r'
+                    i_num += 1
                 elif self.community.status_history_dict[_id][i] == 'removed':
                     col = 'k'
+                    r_num += 1
                 lines[lnum].set_color(col)
 
-            ax.text(0.05, 0.95, stat_str, transform=ax.transAxes, fontsize=14,
+            stat_str = f'\nNumber of Susceptible: {s_num} \n' + \
+                    f'Number of Infected: {i_num} \n' + \
+                    f'Number of Removed: {r_num}'
+            ax.text(0.05, 0.95, stat_str, transform=ax.transAxes, fontsize=8,
                     verticalalignment='top', bbox=props)
 
             # time_text.set_text(time_template % (i * dt))
@@ -164,9 +175,9 @@ def main():
     NUM_PEOPLE = 50
     NUM_INFECTED = 2
     GRID_SIZE = 10  
-    TIME_STEPS = 50
+    TIME_STEPS = 200
     RADIUS_OF_INFECTION = 1
-    CHANCE_OF_INFECTION = 0.02
+    CHANCE_OF_INFECTION = 0.01
     DURATION_OF_INFECTION = 25
     SAVE = True
 
@@ -192,7 +203,7 @@ def main():
     if SAVE:
         Writer = animation.writers['ffmpeg']
         writer = Writer(fps=15, metadata=dict(artist='JRainbow'), bitrate=1800)
-        ani.save(os.path.join('animations', f'{NUM_PEOPLE}_people_{NUM_INFECTED}_infected_with_removed_radius_1_chance_0_02_text.mp4'), writer=writer)
+        ani.save(os.path.join('animations', f'{NUM_PEOPLE}_people_{NUM_INFECTED}_infected_with_removed_radius_1_chance_0_01_final.mp4'), writer=writer)
 
 if __name__ == '__main__':
     main()
